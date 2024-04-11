@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css"/>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/semantic.min.css"/>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/bootstrap.min.css"/>
+
+</head>
+<body>
+    
+<!---Parte cliente-->
+
+
+<div>
+
+<input type="text" id="txtNotificationType" placeholder="Tipo De Notificacion">
+<input type="text" id="txtTitle" placeholder="Titulo">
+<input type="text" id="txtMessage" placeholder="Mensaje">
+<button onclick="btnEnviar_onclick()">Enviar</button>
+
+
+</div>
+    
+
+
+    <script>
+
+
+
+         const connection = new signalR.HubConnectionBuilder()
+
+            .withUrl("https://localhost:7258/notificationHub")
+            .build();
+
+         
+connection.start();
+
+
+async function btnEnviar_onclick(){
+
+    const type = document.getElementById('txtNotificationType').value;
+    const title = document.getElementById('txtTitle').value;
+    const message = document.getElementById('txtMessage').value;
+    await SendNotification(type, title, message);
+
+
+}
+
+async function SendNotification(type,title,message){
+
+try{
+
+    connection.invoke("SendNotifications","success","test","mensaje de prueba")
+
+}catch(err){
+
+    console.error(err.toString());
+}
+
+
+
+}
+
+connection.on("ReceiveNotification",function(type,title,message){
+ 
+    console.log([type,title,message]);
+    alertify.notify(message, type);
+
+});
+
+                
+
+    </script>
+</body>
+</html>
